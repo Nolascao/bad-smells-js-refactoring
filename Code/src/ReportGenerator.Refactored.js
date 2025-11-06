@@ -1,4 +1,4 @@
-export class ReportGenerator {
+class ReportGenerator {
 constructor(database) {
   this.db = database;
 }
@@ -47,33 +47,52 @@ getFormatter(reportType) {
 
 const VALUE_PRIORITY_ADMIN = 1000;
 const VALUE_LIMIT_USER = 500;
+const NOT_IMPLEMENTED_ERROR = 'Método não implementado';
 
 class ReportFormatter {
-generateHeader(user) {
-  throw new Error('Método não implementado');
+generateHeader() {
+  throw new Error(NOT_IMPLEMENTED_ERROR);
 }
-generateItem(user, item) {
-  throw new Error('Método não implementado');
+generateItem() {
+  throw new Error(NOT_IMPLEMENTED_ERROR);
 }
-generateFooter(total) {
-  throw new Error('Método não implementado');
+generateFooter() {
+  throw new Error(NOT_IMPLEMENTED_ERROR);
 }
 }
 
 class CsvFormatter extends ReportFormatter {
-generateHeader(user) {
+generateHeader() {
   return 'ID,NOME,VALOR,USUARIO\n';
 }
 generateItem(user, item) {
   return `${item.id},${item.name},${item.value},${user.name}\n`;
 }
 generateFooter(total) {
-  return `\nTotal,,\n${total},,\n`;
+  return `Total,,\n${total},,\n`;
 }
 }
 
 class HtmlFormatter extends ReportFormatter {
 generateHeader(user) {
-  return `\n`; 
-} 
-}
+  return `<html><body>
+<h1>Relatório</h1>
+<h2>Usuário: ${user.name}</h2>
+<table>
+<tr><th>ID</th><th>Nome</th><th>Valor</th></tr>
+`;
+  }
+  
+  generateItem(user, item) {
+    if (item.priority) {
+      return `<tr style="font-weight:bold;"><td>${item.id}</td><td>${item.name}</td><td>${item.value}</td></tr>\n`;
+    }
+    return `<tr><td>${item.id}</td><td>${item.name}</td><td>${item.value}</td></tr>\n`;
+  }
+  
+  generateFooter(total) {
+    return `</table>
+<h3>Total: ${total}</h3>
+</body></html>\n`; } }
+
+module.exports = { ReportGenerator };
